@@ -1,4 +1,5 @@
 from tkinter import *
+import matplotlib.pyplot as plt
 import re
 
 
@@ -37,15 +38,29 @@ class Table:
 
 
 lst = [("ID", 'username', 'password', 'strength of password'),
-       (1, 'egzon', '123', str(check('123'))),
-       (2, 'smith', 'Book123#', str(check('Book123#'))),
-       (3, 'george', 'george1', str(check('georgee1'))),
-       (4, 'barack', 'football', str(check('football')))]
+       (1, 'egzon', 'egzonmanchester', str(check('egzonmanchester'))),
+       (2, 'smith', '17.02.2008', str(check('17.02.2008'))),
+       (3, 'george', 'Lipjani123$', str(check('Lipjani123$')))]
 
 total_rows = len(lst)
 total_columns = len(lst[0])
 
-
 root = Tk()
 t = Table(root)
 root.mainloop()
+
+# x axis
+x = ["egzonmanchester", "17.02.2008", "Lipjani123$"]
+# y axis
+y = [check("egzonmanchester"), check("17.02.2008"), check("Lipjani123$")]
+
+# plotting the points
+plt.plot(x, y)
+
+plt.xlabel('Passwords')
+
+plt.ylabel('Strength')
+
+plt.title('Graph based on the strength of passwords')
+
+plt.show()
