@@ -54,12 +54,8 @@ def generate_cipher(aes_key, iv):
 
 def decrypt_password(ciphertext, secret_key):
     try:
-        # (3-a) Initialisation vector for AES decryption
         initialisation_vector = ciphertext[3:15]
-        # (3-b) Get encrypted password by removing suffix bytes (last 16 bits)
-        # Encrypted password is 192 bits
         encrypted_password = ciphertext[15:-16]
-        # (4) Build the cipher to decrypt the ciphertext
         cipher = generate_cipher(secret_key, initialisation_vector)
         decrypted_pass = decrypt_payload(cipher, encrypted_password)
         decrypted_pass = decrypted_pass.decode()
@@ -94,25 +90,45 @@ class Table:
                 self.e.insert(END, lst[i][j])
 
 
-lst = [("ID", 'username', 'password', 'strength of password'),
-       (1, 'egzon', 'egzonmanchester', str(check('egzonmanchester'))),
-       (2, 'smith', '17.02.2008', str(check('17.02.2008'))),
-       (3, 'george', 'Lipjani123$', str(check('Lipjani123$')))]
+if __name__ == '__main__':
+    try:
+        with open('decrypted_password.csv', mode='w', newline='') as decrypt_password_file:
+            csv_writer = csv.writer(decrypt_password_file, delimiter=',')
+            csv_writer.writerow(["index", "url", "username", "password"])
+            secret_key = get_secret_key()
+            folders = [element for element in os.listdir(CHROME_PATH) if
+                       re.search("^Profile*|^Default$", element) != None]
+            for folder in folders:
+                chrome_path_login_db = r"%s\%s\Login Data" % (CHROME_PATH, folder)
+                conn = get_db_connection(chrome_path_login_db)
+                if (secret_key and conn):
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT action_url, username_value, password_value FROM logins")
+                    strengthOfPassword = []
+                    decryptedPassword = []
+                    urlOfSite = []
+                    usernameInThatSite = []
+                    for index, login in enumerate(cursor.fetchall()):
+                        url = login[0]
+                        username = login[1]
+                        ciphertext = login[2]
+                        if (url != "" and username != "" and ciphertext != ""):
+                            decrypted_password = decrypt_password(ciphertext, secret_key)
+                            strengthOfPassword.insert(0,check(decrypted_password))
+                            decryptedPassword.insert(0,decrypted_password)
+                            urlOfSite.insert(0,url)
+                            usernameInThatSite.insert(0,username)
+                            print("Sequence: %d" % (index))
+                            print("URL: %s\nUser Name: %s\nPassword: %s\nHow much strong? %s\n" % (url, username, decrypted_password, check(decrypted_password)))
+                            print("*" * 50)
+                            csv_writer.writerow([index, url, username, decrypted_password])
+                    cursor.close()
+                    conn.close()
+                    os.remove("Loginvault.db")
+    except Exception as e:
+        print("[ERR] " % str(e))
 
-total_rows = len(lst)
-total_columns = len(lst[0])
-
-root = Tk()
-t = Table(root)
-root.mainloop()
-
-# x axis
-x = ["egzonmanchester", "17.02.2008", "Lipjani123$"]
-# y axis
-y = [check("egzonmanchester"), check("17.02.2008"), check("Lipjani123$")]
-
-# plotting the points
-plt.plot(x, y)
+plt.plot(decryptedPassword, strengthOfPassword)
 
 plt.xlabel('Passwords')
 
@@ -121,3 +137,30 @@ plt.ylabel('Strength')
 plt.title('Graph based on the strength of passwords')
 
 plt.show()
+
+
+class Table:
+
+    def __init__(self, root):
+
+        for i in range(total_columns):
+            for j in range(total_rows):
+                self.e = Entry(root, width=20, fg='black',
+                               font=('Arial', 14, 'bold'))
+
+                self.e.grid(row=j, column=i)
+                self.e.insert(END, lst[i][j])
+
+urlOfSite.insert(0, "URL")
+usernameInThatSite.insert(0, "Username")
+decryptedPassword.insert(0, "Password")
+strengthOfPassword.insert(0, "Strength of the password")
+
+lst = [(urlOfSite),(usernameInThatSite),(decryptedPassword),(strengthOfPassword)]
+
+total_rows = len(lst[0])
+total_columns = len(lst)
+
+root = Tk()
+t = Table(root)
+root.mainloop()
