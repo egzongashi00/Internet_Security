@@ -162,5 +162,6 @@ total_rows = len(lst[0])
 total_columns = len(lst)
 
 root = Tk()
+root.title('Chrome password retriver')
 t = Table(root)
 root.mainloop()
