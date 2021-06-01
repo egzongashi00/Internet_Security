@@ -1,5 +1,5 @@
 # Internet Security Project
-This is a project on retriving passwords from web browsers that are saved there.
+This is a project on retriving passwords from Chrome that are saved there.
 
 ## How to use the program
 1. Click run main.py.
@@ -7,7 +7,7 @@ This is a project on retriving passwords from web browsers that are saved there.
 
 ![Main](/images/main.PNG)
 
-3. You select one (for example you select Chrome)
+3. You select Chrome.
 4. Right after that, the graph shows up, with each password and their strength.
 
 ![Chromexy](images/chromexy.png)
