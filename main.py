@@ -2,9 +2,7 @@ import tkinter
 import os
 
 OPTIONS = [
-"Chrome",
-"Mozilla",
-"Opera"
+"Chrome"
 ]
 
 window = tkinter.Tk()
@@ -15,10 +13,6 @@ window.title('Web browser password retriver')
 def get():
     if variable.get() == 'Chrome':
         os.system('python chrome.py')
-    elif variable.get() == 'Opera':
-        os.system('python opera.py')
-    elif variable.get() == 'Mozilla':
-        os.system('python mozilla.py')
 
 
 variable = tkinter.StringVar(window)
